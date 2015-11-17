@@ -43,7 +43,7 @@ VER=0.1
 
 # kernel version string appended to 3.4.x-delidded-kernel-hlte-
 # (shown in Settings -> About device)
-KERNEL_VERSION=$VARIANT-$VER-cm12.1
+KERNEL_VERSION=$VARIANT-$VER-cm12.1-5.1.1
 
 [ -z $PERMISSIVE ] && \
 # should we boot with SELinux mode set to permissive? (1 = permissive, 0 = enforcing)
