@@ -569,9 +569,6 @@ static int msm_isp_send_hw_cmd(struct vfe_device *vfe_dev,
 		lo_tbl_ptr = cfg_data +
 			reg_cfg_cmd->u.dmi_info.lo_tbl_offset/4;
 
-		if (reg_cfg_cmd->cmd_type == VFE_WRITE_DMI_64BIT) {
-			reg_cfg_cmd->u.dmi_info.len = reg_cfg_cmd->u.dmi_info.len/2;
-		}
 		for (i = 0; i < reg_cfg_cmd->u.dmi_info.len/4; i++) {
 			lo_val = *lo_tbl_ptr++;
 			if (reg_cfg_cmd->cmd_type == VFE_WRITE_DMI_16BIT) {
@@ -681,17 +678,10 @@ int msm_isp_proc_cmd(struct vfe_device *vfe_dev, void *arg)
 		goto copy_cmd_failed;
 	}
 
-	if( (vfe_dev->frame_id == proc_cmd->frame_id && vfe_dev->eof_event_occur != 1)
-		|| proc_cmd->frame_id == 0) {
-		for (i = 0; i < proc_cmd->num_cfg; i++)
-			msm_isp_send_hw_cmd(vfe_dev, &reg_cfg_cmd[i],
-				cfg_data, proc_cmd->cmd_len);
-	}
-	else{
-		rc = MSM_VFE_REG_CFG_FRAME_ID_NOT_MATCH_ERROR;
-		pr_err("%s: skip hw update, platform_id=%u, kernel_id=%u, eof_event_occur=%u\n",
-			__func__,proc_cmd->frame_id, vfe_dev->frame_id, vfe_dev->eof_event_occur);
-	}
+	for (i = 0; i < proc_cmd->num_cfg; i++)
+		msm_isp_send_hw_cmd(vfe_dev, &reg_cfg_cmd[i],
+			cfg_data, proc_cmd->cmd_len);
+
 	if (copy_to_user(proc_cmd->cfg_data,
 			cfg_data, proc_cmd->cmd_len)) {
 		rc = -EFAULT;
